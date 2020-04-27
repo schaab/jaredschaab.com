@@ -1,0 +1,23 @@
+{
+  "name": "jaredschaab.com",
+  "version": "1.0.0",
+  "description": "Digital garden",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schaab/jaredschaab.com.git"
+  },
+  "keywords": [
+    "digital",
+    "garden"
+  ],
+  "author": "Jared Schaab",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/schaab/jaredschaab.com/issues"
+  },
+  "homepage": "https://github.com/schaab/jaredschaab.com#readme"
+}
