@@ -1,4 +1,10 @@
-import type { V2_MetaFunction } from "@remix-run/node";
+import type { V2_MetaFunction, LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
+
+import { path, fs } from '~/utils/path.server';
+import { bundleMDX } from "~/utils/compile-mdx.server";
+
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -7,35 +13,58 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
+
+export const loader : LoaderFunction = async () => {
+  // Get our working directory for posts
+  const pathToPosts = path.join(process.cwd(), 'posts');
+
+  // Get the directories of the blog entries
+  // right now we are just assuming that there will be no rogue files
+  // and the structure will be posts -> post-dir -> index.md
+  const postDirectories = fs.readdirSync(pathToPosts);
+
+  // pull all the front matter for each post and return it so
+  // we can list it out.
+  const postFrontMatterPromise = postDirectories.map(async (postDirectory) => {
+    const pathToMdx = path.join(process.cwd(), 'posts', postDirectory, 'index.mdx');
+    const postRootDirectory = pathToMdx.replace(/index.[mdx/md]?$/, '');
+
+    const result =  await bundleMDX({
+      file: pathToMdx,
+      cwd: postRootDirectory,
+    });
+
+    return {
+      ...result.frontmatter,
+      slug: postDirectory,
+    }
+  })
+
+  const postFrontMatter = await Promise.all(postFrontMatterPromise);
+  console.log(postFrontMatter)
+  return json(postFrontMatter)
+}
+
 export default function Index() {
+  const data = useLoaderData();
+
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
+
       <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-            className="font-bold"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
+        {
+          data.map(({slug, meta}) => (
+            <li key={slug}>
+              <Link to={`/posts/${slug}`}>
+                {meta.title}
+              </Link>
+              {meta.description ? (
+                <p>{meta.description}</p>
+              ) : null
+              }
+            </li>
+          ))
+        }
       </ul>
     </div>
   );
