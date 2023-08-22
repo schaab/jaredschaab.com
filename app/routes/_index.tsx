@@ -1,5 +1,4 @@
-import type { V2_MetaFunction, LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { type V2_MetaFunction, type LoaderFunction, json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { path, fs } from '~/utils/path.server';
@@ -13,6 +12,12 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
+type LoaderData = {
+  slug: string;
+  meta: {
+    [key: string]: any
+  }
+}[];
 
 export const loader : LoaderFunction = async () => {
   // Get our working directory for posts
@@ -41,12 +46,12 @@ export const loader : LoaderFunction = async () => {
   })
 
   const postFrontMatter = await Promise.all(postFrontMatterPromise);
-  console.log(postFrontMatter)
+
   return json(postFrontMatter)
 }
 
 export default function Index() {
-  const data = useLoaderData();
+  const data = useLoaderData<LoaderData>();
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
