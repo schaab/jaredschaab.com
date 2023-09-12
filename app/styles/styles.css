@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.wrapper {
+  @apply
+    flex
+    flex-col
+    gap-4;
+}
+
+header {
+  --padding-x: calc(5vw - 0.5rem);
+  @apply
+    flex
+    flex-row
+    justify-between
+    items-center
+    m-0
+    py-2
+    px-[var(--padding-x)];
+}
+
+nav {
+  @apply
+    flex
+    flex-row
+    gap-4;
+}
+
+.home-link {
+
+}
